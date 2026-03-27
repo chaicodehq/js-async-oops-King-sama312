@@ -74,13 +74,87 @@
  *   const boundFn = fixWithBind(cart);         // properly bound sellItem
  */
 export function createSamosaCart(ownerName, location) {
-  // Your code here
+  return {
+    owner: ownerName,
+    location: location,
+    menu: {
+      samosa: 15,
+      jalebi: 20,
+      kachori: 25
+    },
+    sales: [],
+
+    sellItem(itemName, quantity) {
+      // Step 2: Validation
+      if (!this.menu[itemName] || quantity <= 0) {
+        return -1;
+      }
+
+      // Step 3: Calculate total
+      const total = this.menu[itemName] * quantity;
+
+      // Step 4: Record sale
+      this.sales.push({
+        item: itemName,
+        quantity: quantity,
+        total: total
+      });
+
+      return total;
+    },
+
+    getDailySales() {
+      // Step 5: Sum all totals
+      if (this.sales.length === 0) return 0;
+
+      return this.sales.reduce((sum, sale) => sum + sale.total, 0);
+    },
+
+    getPopularItem() {
+      // Step 6: Handle no sales
+      if (this.sales.length === 0) return null;
+
+      const itemCount = {};
+
+      // Step 7: Aggregate quantities
+      this.sales.forEach(sale => {
+        itemCount[sale.item] = (itemCount[sale.item] || 0) + sale.quantity;
+      });
+
+      // Step 8: Find max
+      let maxItem = null;
+      let maxQty = 0;
+
+      for (let item in itemCount) {
+        if (itemCount[item] > maxQty) {
+          maxQty = itemCount[item];
+          maxItem = item;
+        }
+      }
+
+      return maxItem;
+    },
+
+    moveTo(newLocation) {
+      // Step 9: Update location
+      this.location = newLocation;
+      return `${this.owner} ka cart ab ${newLocation} pe hai!`;
+    },
+
+    resetDay() {
+      // Step 10: Clear sales
+      this.sales = [];
+      return `${this.owner} ka naya din shuru!`;
+    }
+  };
 }
 
 export function demonstrateThisLoss(cart) {
-  // Your code here
+  // Destructure → loses `this`
+  const { sellItem } = cart;
+  return sellItem;
 }
 
 export function fixWithBind(cart) {
-  // Your code here
+  return cart.sellItem.bind(cart);
 }
